@@ -112,6 +112,10 @@ NFCSTATUS NciStateMonitor::handleVendorNciRspNtf(uint16_t dataLen,
   }
 
   switch (mGidOid) {
+  case NCI_EE_STATUS_NTF: {
+    status = NfceeStateMonitor::getInstance()->processNfceeStatusNtf(nciRspNtf);
+    break;
+  }
   case NCI_EE_MODE_SET_NTF: {
     status = NfceeStateMonitor::getInstance()->processNfceeModeSetNtf(nciRspNtf);
     break;

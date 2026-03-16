@@ -65,7 +65,6 @@ public class NfcOperations {
     private NfcAdapter mNfcAdapter;
     private NfcOemExtension mNfcOemExtension;
     private INxpOEMCallbacks mNxpOemCallbacks = null;
-    private Object mCallbackLock = new Object();
 
     /**
      * @brief hold callback executor.
@@ -228,15 +227,12 @@ public class NfcOperations {
      * @param isRegister
      */
     private void conditionallyRegisterOemCallback(boolean isRegister) {
-        synchronized (mCallbackLock) {
-            if (mNxpOemCallbacks == null) {
-                if (isRegister) {
-                    mNfcOemExtension.registerCallback(CALLBACK_EXECUTOR,
-                                                        mOemExtensionCallback);
-                } else {
-                    mNfcOemExtension.unregisterCallback(mOemExtensionCallback);
-                }
-            }
+        if (mNxpOemCallbacks == null) {
+            if (isRegister)
+                mNfcOemExtension.registerCallback(CALLBACK_EXECUTOR,
+                                                    mOemExtensionCallback);
+            else
+                mNfcOemExtension.unregisterCallback(mOemExtensionCallback);
         }
     }
     /**
@@ -307,20 +303,19 @@ public class NfcOperations {
      * @param nxpOEMCallback callback to be register
      */
     public void registerNxpOemCallback(INxpOEMCallbacks nxpOEMCallback) {
-        synchronized (mCallbackLock) {
+        synchronized (NfcOperations.this) {
             if (mNxpOemCallbacks == null) {
                 resetOemCallbackMap();
                 mCallbackCountDownLatch = new CountDownLatch(mOemCallbackMap.size());
                 mNfcOemExtension.registerCallback(CALLBACK_EXECUTOR,
                                                     mOemExtensionCallback);
                 try {
-                    if (mCallbackCountDownLatch != null) {
+                    if(mCallbackCountDownLatch != null) {
                         boolean callbackFlag  = mCallbackCountDownLatch.await(
                                                     NxpNfcConstants.CALLBACK_TIME_OUT_VAL,
                                                     TimeUnit.MILLISECONDS);
-                        if (!callbackFlag) {
+                        if (!callbackFlag)
                             NxpNfcLogger.e(TAG, "All OEM callbacks are not received");
-                        }
                     }
                 } catch (InterruptedException e) {
                     NxpNfcLogger.e(TAG, "Error in registerCallback");
@@ -351,7 +346,7 @@ public class NfcOperations {
      * @brief unregisters to OEM callbacks through NXP extensions
      */
     public void unregisterNxpOemCallback() {
-        synchronized (mCallbackLock) {
+        synchronized (NfcOperations.this) {
             if (mNxpOemCallbacks != null) {
                 mNfcOemExtension.unregisterCallback(mOemExtensionCallback);
             }
