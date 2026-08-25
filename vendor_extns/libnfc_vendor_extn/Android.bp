@@ -121,30 +121,3 @@ cc_library_shared {
         "vendor.nxp.nxpnfc_aidl-V1-ndk",
     ],
 }
-
-cc_library_shared {
-    name: "libnfc_vendor_extn_vnd",
-    stem: "libnfc_vendor_extn",
-    proprietary: true,
-    enabled: false,
-    defaults: [
-        "extn_defaults",
-    ],
-    export_include_dirs: [
-        "inc/vendor_ext",
-        "src/pal/vendor_ext",
-        "src/features/nci_state_monitor",
-    ],
-    srcs: [
-        "src/pal/vendor_ext/PlatformAbstractionLayer.cpp",
-    ],
-    include_dirs: [
-        "hardware/nxp/nfc/snxxx/halimpl_v2/common",
-        "hardware/nxp/nfc/snxxx/halimpl_v2/hal",
-        "hardware/nxp/nfc/snxxx/features/nfc_extn",
-        "hardware/nxp/nfc/snxxx/halimpl_v2/tml",
-    ],
-    shared_libs: [
-        "nfc_nci_nxp_snxxx_v2",
-    ],
-}
